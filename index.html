@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pension Calculator</title>
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-container h2 {
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .form-group button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .form-group button:hover {
+      background: #0056b3;
+    }
+    hr {
+      margin: 20px 0;
+      border: none;
+      border-top: 1px solid #ddd;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    canvas {
+      margin-top: 30px;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Pension Calculator</h2>
+    <form id="pension-form">
+      <div class="form-group">
+        <label for="age-today">Age Today</label>
+        <input type="number" id="age-today" name="ageToday" placeholder="Enter your current age" required>
+      </div>
+      <div class="form-group">
+        <label for="age-retirement">Age at Retirement</label>
+        <input type="number" id="age-retirement" name="ageRetirement" placeholder="Enter your retirement age" required>
+      </div>
+      <hr> <!-- Horizontal line added here -->
+      <div class="form-group">
+        <label for="pension-value">Pension Value Today (£)</label>
+        <input type="number" id="pension-value" name="pensionValue" placeholder="Enter current pension value" required>
+      </div>
+      <div class="form-group">
+        <label for="annual-pension-contributions">Annual Pension Contributions (£)</label>
+        <input type="number" id="annual-pension-contributions" name="annualPensionContributions" placeholder="Enter annual pension contributions" required>
+      </div>
+      <div class="form-group">
+        <label for="isa-start-value">ISA Start Value (£)</label>
+        <input type="number" id="isa-start-value" name="isaStartValue" placeholder="Enter current ISA value" required>
+      </div>
+      <div class="form-group">
+        <label for="annual-isa-contributions">Annual ISA Contributions (£)</label>
+        <input type="number" id="annual-isa-contributions" name="annualIsaContributions" placeholder="Enter annual ISA contributions" required>
+      </div>
+      <div class="form-group">
+        <label for="db-income">Defined Benefit Pension Income (£/year)</label>
+        <input type="number" id="db-income" name="dbIncome" placeholder="Enter annual DB pension income">
+      </div>
+      <div class="form-group">
+        <label for="db-start-age">Starting Age for Defined Benefit Pension Income (Years)</label>
+        <input type="number" id="db-start-age" name="dbStartAge" placeholder="Enter age when DB pension starts">
+      </div>
+      <hr> <!-- Horizontal line added here -->
+      <div class="form-group">
+        <label for="post-tax-income">Desired Post-Tax Income at Retirement (£)</label>
+        <input type="number" id="post-tax-income" name="postTaxIncome" placeholder="Enter desired income at retirement" required>
+      </div>
+      <div class="form-group">
+        <button type="submit">Calculate</button>
+      </div>
+    </form>
+    <!-- Chart for Combined Balances -->
+    <canvas id="pensionChart" width="800" height="400"></canvas>
+  </div>
+
+  <script src="calculations.js"></script>
+</body>
+</html>
