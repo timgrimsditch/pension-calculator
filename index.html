@@ -1,0 +1,620 @@
+<!DOCTYPE html><script src="/__replco/static/devtools/eruda/3.2.3/eruda.js"></script><script src="/__replco/static/devtools/injected.js"onerror="parent.postMessage({event:'error',payload:'script.onerror: Failed to load '+event.target.src},'https://replit.com')"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pension Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .section-card {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .summary-section {
+            background-color: #f8fafc;
+            border-left: 4px solid #f97316;
+        }
+
+        .chart-section {
+            background-color: #fafafa;
+            border-left: 4px solid #f97316;
+        }
+
+        .table-section {
+            background-color: #f9fafb;
+            border-left: 4px solid #f97316;
+        }
+
+        .section-title {
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto p-4">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="mb-4">
+                <h1 class="text-2xl font-bold mb-2">Pension Calculator</h1>
+                <p class="text-sm text-gray-500">All values are adjusted for inflation over time</p>
+            </div>
+
+            <form id="calculatorForm" class="space-y-8 mb-6">
+                <!-- About You Section -->
+                <div class="border-2 rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-blue-600">About You</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">Current Age</label>
+                            <input type="number" name="currentAge" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Retirement Age</label>
+                            <input type="number" name="retirementAge" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Finances Section -->
+                <div class="border-2 rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-green-600">Your Finances</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">Current Pension Savings (£)</label>
+                            <input type="number" name="currentPensionSavings" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Annual Pension Contributions (£)</label>
+                            <input type="number" name="annualPensionContributions" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Current ISA Savings (£)</label>
+                            <input type="number" name="currentIsaSavings" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Annual ISA Contributions (£)</label>
+                            <input type="number" name="annualIsaContributions" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Annual Post Retirement Income (£)</label>
+                            <input type="number" name="postRetirementIncome" value="0" class="w-full px-3 py-2 border rounded-md">
+                            <p class="text-sm text-gray-500 mt-1">e.g. rental property income</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Goal Section -->
+                <div class="border-2 rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-purple-600">Your Goal</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">Desired Post-Tax Income (£)</label>
+                            <input type="number" name="desiredPostTaxIncome" value="0" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" name="takeLumpSum" checked class="rounded text-orange-500">
+                            <label>Take 25% tax-free lump sum at age 55</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Rates Section -->
+                <div class="border-2 rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-orange-600">Market Rates</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block mb-2">Investment Return Rate (%)</label>
+                            <input type="number" name="returnRate" value="7" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                        <div>
+                            <label class="block mb-2">Inflation Rate (%)</label>
+                            <input type="number" name="inflationRate" value="2" class="w-full px-3 py-2 border rounded-md">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600">
+                    Calculate
+                </button>
+            </form>
+
+            <div id="results" class="hidden">
+                <div id="summary" class="section-card summary-section">
+                    <h3 class="section-title">Summary</h3>
+                    <!-- Summary content will be inserted here by JavaScript -->
+                </div>
+
+                <div class="section-card chart-section">
+                    <h3 class="section-title">Total Savings Over Time</h3>
+                    <canvas id="savingsChart" class="w-full h-64 mb-6"></canvas>
+                </div>
+
+                <div class="section-card chart-section">
+                    <h3 class="section-title">Income Sources in Retirement</h3>
+                    <canvas id="incomeChart" class="w-full h-64 mb-6"></canvas>
+                </div>
+
+                <div class="section-card table-section">
+                    <h3 class="section-title">Year By Year Results</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Age</th>
+                                    <th class="px-4 py-2 text-left">Combined Pension and ISA Savings</th>
+                                    <th class="px-4 py-2 text-left">Investment Returns</th>
+                                    <th class="px-4 py-2 text-left">Combined Pension and ISA Contributions</th>
+                                    <th class="px-4 py-2 text-left">Pension Withdrawals (Post-Tax)</th>
+                                    <th class="px-4 py-2 text-left">ISA Withdrawal</th>
+                                    <th class="px-4 py-2 text-left">Post-Retirement Income</th>
+                                    <th class="px-4 py-2 text-left">State Pension</th>
+                                    <th class="px-4 py-2 text-left">Total Income</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let savingsChart = null;
+        let incomeChart = null;
+
+        function calculateTax(income, yearsSinceStart, inflationRate) {
+            const inflationFactor = Math.pow(1 + inflationRate / 100, yearsSinceStart);
+            const personalAllowance = 12570 * inflationFactor;
+            const basicRateLimit = 50270 * inflationFactor;
+            const additionalRateLimit = 125140 * inflationFactor;
+
+            let tax = 0;
+            let remaining = income;
+
+            if (remaining > additionalRateLimit) {
+                tax += (remaining - additionalRateLimit) * 0.45;
+                remaining = additionalRateLimit;
+            }
+            if (remaining > basicRateLimit) {
+                tax += (remaining - basicRateLimit) * 0.4;
+                remaining = basicRateLimit;
+            }
+            if (remaining > personalAllowance) {
+                tax += (remaining - personalAllowance) * 0.2;
+            }
+
+            return tax;
+        }
+
+        function calculateOptimalWithdrawals(targetIncome, pensionPot, isaPot, statePension, yearsSinceStart, inflationRate) {
+            const inflationFactor = Math.pow(1 + inflationRate / 100, yearsSinceStart);
+            const personalAllowance = 12570 * inflationFactor;
+            const basicRateLimit = 50270 * inflationFactor;
+
+            let remainingNeeded = targetIncome;
+            let pensionWithdrawal = 0;
+            let isaWithdrawal = 0;
+
+            // First use state pension
+            remainingNeeded -= statePension;
+
+            // Then use ISA first (tax-free)
+            if (remainingNeeded > 0) {
+                const isaAmount = Math.min(remainingNeeded, isaPot);
+                isaWithdrawal = isaAmount;
+                remainingNeeded -= isaAmount;
+            }
+
+            // Then use pension if needed
+            if (remainingNeeded > 0) {
+                const grossPensionNeeded = remainingNeeded + calculateTax(remainingNeeded + statePension, yearsSinceStart, inflationRate);
+                pensionWithdrawal = Math.min(grossPensionNeeded, pensionPot);
+                remainingNeeded -= (pensionWithdrawal - calculateTax(pensionWithdrawal + statePension, yearsSinceStart, inflationRate));
+            }
+
+            // Use remaining pension if needed
+            if (remainingNeeded > 0) {
+                const additionalPensionNet = remainingNeeded;
+                const additionalPensionGross = additionalPensionNet + 
+                    calculateTax(additionalPensionNet + statePension + isaWithdrawal + pensionWithdrawal, yearsSinceStart, inflationRate);
+                pensionWithdrawal += Math.min(additionalPensionGross, Math.max(0, pensionPot - pensionWithdrawal));
+            }
+
+            return { pensionWithdrawal, isaWithdrawal };
+        }
+
+        function getLifeExpectancy(currentAge) {
+            const lifeExpectancyData = [
+                // CSV data converted to array
+                {age: 0, females: 83.04}, {age: 1, females: 82.33}, {age: 2, females: 81.35},
+                {age: 3, females: 80.36}, {age: 4, females: 79.37}, {age: 5, females: 78.38},
+                {age: 6, females: 77.38}, {age: 7, females: 76.39}, {age: 8, females: 75.39},
+                {age: 9, females: 74.40}, {age: 10, females: 73.40}, {age: 11, females: 72.41},
+                {age: 12, females: 71.41}, {age: 13, females: 70.42}, {age: 14, females: 69.42},
+                {age: 15, females: 68.43}, {age: 16, females: 67.44}, {age: 17, females: 66.45},
+                {age: 18, females: 65.46}, {age: 19, females: 64.47}, {age: 20, females: 63.48},
+                {age: 21, females: 62.49}, {age: 22, females: 61.51}, {age: 23, females: 60.52},
+                {age: 24, females: 59.53}, {age: 25, females: 58.55}, {age: 26, females: 57.56},
+                {age: 27, females: 56.58}, {age: 28, females: 55.59}, {age: 29, females: 54.61},
+                {age: 30, females: 53.63}, {age: 31, females: 52.65}, {age: 32, females: 51.67},
+                {age: 33, females: 50.69}, {age: 34, females: 49.71}, {age: 35, females: 48.74},
+                {age: 36, females: 47.77}, {age: 37, females: 46.80}, {age: 38, females: 45.83},
+                {age: 39, females: 44.87}, {age: 40, females: 43.91}, {age: 41, females: 42.95},
+                {age: 42, females: 41.99}, {age: 43, females: 41.04}, {age: 44, females: 40.09},
+                {age: 45, females: 39.14}, {age: 46, females: 38.19}, {age: 47, females: 37.25},
+                {age: 48, females: 36.32}, {age: 49, females: 35.39}, {age: 50, females: 34.46},
+                {age: 51, females: 33.54}, {age: 52, females: 32.62}, {age: 53, females: 31.70},
+                {age: 54, females: 30.79}, {age: 55, females: 29.88}, {age: 56, females: 28.98},
+                {age: 57, females: 28.08}, {age: 58, females: 27.20}, {age: 59, females: 26.31},
+                {age: 60, females: 25.43}, {age: 61, females: 24.56}, {age: 62, females: 23.69},
+                {age: 63, females: 22.83}, {age: 64, females: 21.98}, {age: 65, females: 21.14},
+                {age: 66, females: 20.31}, {age: 67, females: 19.49}, {age: 68, females: 18.67},
+                {age: 69, females: 17.87}, {age: 70, females: 17.07}, {age: 71, females: 16.29},
+                {age: 72, females: 15.51}, {age: 73, females: 14.74}, {age: 74, females: 13.99},
+                {age: 75, females: 13.24}, {age: 76, females: 12.51}, {age: 77, females: 11.80},
+                {age: 78, females: 11.11}, {age: 79, females: 10.43}, {age: 80, females: 9.78},
+                {age: 81, females: 9.15}, {age: 82, females: 8.55}, {age: 83, females: 7.97},
+                {age: 84, females: 7.41}, {age: 85, females: 6.87}, {age: 86, females: 6.36},
+                {age: 87, females: 5.87}, {age: 88, females: 5.41}, {age: 89, females: 4.99},
+                {age: 90, females: 4.59}, {age: 91, females: 4.23}, {age: 92, females: 3.89},
+                {age: 93, females: 3.59}, {age: 94, females: 3.32}, {age: 95, females: 3.06},
+                {age: 96, females: 2.83}, {age: 97, females: 2.60}, {age: 98, females: 2.41},
+                {age: 99, females: 2.25}, {age: 100, females: 2.09}
+            ];
+
+            const entry = lifeExpectancyData.find(d => d.age === currentAge);
+            if (!entry) {
+                return currentAge + 2; // fallback for ages over 100
+            }
+            return currentAge + entry.females;
+        }
+
+        function calculatePension(inputs) {
+            const endAge = Math.ceil(getLifeExpectancy(inputs.currentAge));
+            let savingsTrajectory = [];
+            let runOutAge = null;
+            let pensionPot = inputs.currentPensionSavings;
+            let isaPot = inputs.currentIsaSavings;
+            let lumpSumTaken = false;
+
+            for (let currentAge = inputs.currentAge; currentAge <= endAge; currentAge++) {
+                const yearsSinceStart = currentAge - inputs.currentAge;
+                const inflationFactor = Math.pow(1 + inputs.inflationRate / 100, yearsSinceStart);
+
+                const pensionReturns = pensionPot * (inputs.returnRate / 100);
+                const isaReturns = isaPot * (inputs.returnRate / 100);
+                const totalReturns = pensionReturns + isaReturns;
+
+                let pensionWithdrawal = 0;
+                let isaWithdrawal = 0;
+                let lumpSumThisYear = 0;
+                let statePension = currentAge >= 67 ? 11502 * inflationFactor : 0;
+                let postRetirementIncome = currentAge >= inputs.retirementAge ? inputs.postRetirementIncome * inflationFactor : 0;
+
+                if (currentAge < inputs.retirementAge) {
+                    const inflatedPensionContribution = inputs.annualPensionContributions * inflationFactor;
+                    const inflatedIsaContribution = inputs.annualIsaContributions * inflationFactor;
+
+                    if (!lumpSumTaken && inputs.takeLumpSum && currentAge === Math.max(55, inputs.currentAge)) {
+                        lumpSumThisYear = pensionPot * 0.25;
+                        pensionPot -= lumpSumThisYear;
+                        lumpSumTaken = true;
+                    }
+
+                    pensionPot += inflatedPensionContribution + pensionReturns;
+                    isaPot += inflatedIsaContribution + isaReturns;
+                } else {
+                    if (!lumpSumTaken && inputs.takeLumpSum) {
+                        lumpSumThisYear = pensionPot * 0.25;
+                        pensionPot -= lumpSumThisYear;
+                        lumpSumTaken = true;
+                    }
+
+                    const targetIncome = inputs.desiredPostTaxIncome * inflationFactor - postRetirementIncome;
+                    const withdrawals = calculateOptimalWithdrawals(
+                        targetIncome,
+                        pensionPot,
+                        isaPot,
+                        statePension,
+                        yearsSinceStart,
+                        inputs.inflationRate
+                    );
+
+                    pensionWithdrawal = withdrawals.pensionWithdrawal;
+                    isaWithdrawal = withdrawals.isaWithdrawal;
+
+                    pensionPot += pensionReturns - pensionWithdrawal;
+                    isaPot += isaReturns - isaWithdrawal;
+                }
+
+                const taxPaid = currentAge >= inputs.retirementAge ?
+                    calculateTax(pensionWithdrawal + statePension, yearsSinceStart, inputs.inflationRate) : 0;
+
+                savingsTrajectory.push({
+                    age: currentAge,
+                    totalSavings: Math.round(pensionPot + isaPot),
+                    pensionSavings: Math.round(pensionPot),
+                    isaSavings: Math.round(isaPot),
+                    returns: Math.round(totalReturns),
+                    contributions: currentAge < inputs.retirementAge ?
+                        Math.round(inputs.annualPensionContributions * inflationFactor +
+                                inputs.annualIsaContributions * inflationFactor) : 0,
+                    pensionWithdrawalPostTax: Math.round(Math.max(0, pensionWithdrawal - taxPaid)),
+                    isaWithdrawal: Math.round(isaWithdrawal),
+                    lumpSum: Math.round(lumpSumThisYear),
+                    statePension: Math.round(statePension),
+                    postRetirementIncome: Math.round(postRetirementIncome),
+                    totalIncome: Math.round(pensionWithdrawal - taxPaid + isaWithdrawal + statePension + postRetirementIncome)
+                });
+
+                if ((pensionPot + isaPot) <= 0 && !runOutAge && currentAge >= inputs.retirementAge) {
+                    runOutAge = currentAge;
+                    pensionPot = 0;
+                    isaPot = 0;
+                }
+            }
+
+            return { savingsTrajectory, runOutAge, endAge };
+        }
+
+        function calculateSustainableIncomeIncrease(finalPensionPot, finalIsaPot, inputs) {
+            const totalFinalPot = finalPensionPot + finalIsaPot;
+            const yearsInRetirement = 100 - inputs.retirementAge;
+            const conservativeFactor = 0.8;
+
+            const theoreticalMaxIncrease = (totalFinalPot / yearsInRetirement) * conservativeFactor;
+
+            return Math.round(theoreticalMaxIncrease);
+        }
+
+        function calculateRecommendations(results, inputs) {
+            const finalYear = results.savingsTrajectory[results.savingsTrajectory.length - 1];
+            const finalPensionPot = finalYear.pensionSavings;
+            const finalIsaPot = finalYear.isaSavings;
+            const hasSavingsAtEnd = (finalPensionPot + finalIsaPot) > 0;
+
+            // Get state pension amount for minimum income floor
+            const statePensionAtRetirement = 11502 * Math.pow(1 + inputs.inflationRate / 100, inputs.retirementAge - inputs.currentAge);
+            const lifeExpectancy = results.endAge;
+
+            if (!results.runOutAge && hasSavingsAtEnd) {
+                const sustainableIncrease = calculateSustainableIncomeIncrease(finalPensionPot, finalIsaPot, inputs);
+                return {
+                    isAchievable: true,
+                    sustainableIncome: Math.round(inputs.desiredPostTaxIncome + sustainableIncrease),
+                    lifeExpectancy
+                };
+            }
+
+            // Calculate income shortfall at retirement
+            const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+            const rate = inputs.returnRate / 100;
+
+            // Find the yearly shortfall at retirement
+            const relevantAge = results.runOutAge || results.savingsTrajectory.findIndex(year => 
+                (year.pensionSavings + year.isaSavings) <= 0 && year.age >= inputs.retirementAge);
+            const yearData = results.savingsTrajectory.find(year => year.age === inputs.retirementAge);
+            const retirementIncome = yearData ? yearData.totalIncome : 0;
+            const yearlyShortfall = inputs.desiredPostTaxIncome - retirementIncome;
+
+            // Calculate additional annual contributions needed
+            // Using Future Value of Annuity formula: FV = PMT * ((1 + r)^n - 1) / r
+            // Rearranging to solve for PMT: PMT = FV * r / ((1 + r)^n - 1)
+            const futureValueNeeded = yearlyShortfall / rate; // Capital needed to generate yearly shortfall
+            const additionalAnnualContributions = Math.round(
+                (futureValueNeeded * rate) / (Math.pow(1 + rate, yearsToRetirement) - 1)
+            );
+
+            // Calculate sustainable income with current savings and contributions
+            // This is the actual achievable income with current plan
+            const sustainableIncome = Math.max(
+                Math.round(retirementIncome),
+                Math.round(statePensionAtRetirement)
+            );
+
+            // Calculate years to delay retirement
+            // Using the same Future Value formula but solving for n
+            // n = ln(1 + (FV * r / PMT)) / ln(1 + r)
+            const currentAnnualContributions = inputs.annualPensionContributions;
+            const yearsToDelay = Math.ceil(
+                Math.log(1 + (futureValueNeeded * rate / currentAnnualContributions)) / Math.log(1 + rate)
+            );
+
+            return {
+                isAchievable: false,
+                yearsToDelay: yearsToDelay,
+                additionalContributions: additionalAnnualContributions,
+                sustainableIncome: sustainableIncome,
+                lifeExpectancy
+            };
+        }
+
+        function updateCharts(results) {
+            const ctx1 = document.getElementById('savingsChart').getContext('2d');
+            const ctx2 = document.getElementById('incomeChart').getContext('2d');
+
+            if (savingsChart) savingsChart.destroy();
+            if (incomeChart) incomeChart.destroy();
+
+            savingsChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: results.savingsTrajectory.map(d => d.age),
+                    datasets: [{
+                        label: 'Private Pension',
+                        data: results.savingsTrajectory.map(d => d.pensionSavings),
+                        borderColor: '#2563eb',
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)'
+                    },
+                    {
+                        label: 'ISA',
+                        data: results.savingsTrajectory.map(d => d.isaSavings),
+                        borderColor: '#22c55e',
+                        fill: true,
+                        backgroundColor: 'rgba(34, 197, 94, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: value => `£${(value / 1000).toLocaleString()}k`
+                            }
+                        }
+                    }
+                }
+            });
+
+            incomeChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: results.savingsTrajectory.map(d => d.age),
+                    datasets: [{
+                        label: 'Tax-Free Lump Sum',
+                        data: results.savingsTrajectory.map(d => d.lumpSum),
+                        backgroundColor: '#fbbf24'
+                    },
+                    {
+                        label: 'Post-Retirement Income',
+                        data: results.savingsTrajectory.map(d => d.postRetirementIncome),
+                        backgroundColor: '#9333ea'
+                    },
+                    {
+                        label: 'State Pension',
+                        data: results.savingsTrajectory.map(d => d.statePension),
+                        backgroundColor: '#ef4444'
+                    },
+                    {
+                        label: 'ISA Withdrawals',
+                        data: results.savingsTrajectory.map(d => d.isaWithdrawal),
+                        backgroundColor: '#22c55e'
+                    },
+                    {
+                        label: 'Pension Withdrawals (Post-Tax)',
+                        data: results.savingsTrajectory.map(d => d.pensionWithdrawalPostTax),
+                        backgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: value => `£${(value / 1000).toLocaleString()}k`
+                            }
+                        },
+                        x: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateResults(results, inputs) {
+            const summary = document.getElementById('summary');
+            const resultsDiv = document.getElementById('results');
+            const resultsTable = document.getElementById('resultsTable');
+
+            resultsDiv.classList.remove('hidden');
+
+            const recommendations = calculateRecommendations(results, inputs);
+
+            if (recommendations.isAchievable) {
+                summary.innerHTML = `
+                    <h3 class="section-title">Summary</h3>
+                    <div class="mb-4 p-4 bg-gray-100 rounded">
+                        <div class="font-semibold text-green-600">
+                            Yes, you're on track for your desired retirement lifestyle!
+                        </div>
+                        <div class="mt-2">
+                            <p>Based on your current plan:</p>
+                            <ul class="list-disc ml-6 mt-2">
+                                <li>You can sustainably withdraw £${recommendations.sustainableIncome.toLocaleString()} per year</li>
+                                <li>Your pension and ISA savings will last beyond age ${recommendations.lifeExpectancy}</li>
+                            </ul>
+                            <p class="mt-2 text-sm text-gray-600">
+                                Note: Calculations are based on average female life expectancy of ${recommendations.lifeExpectancy} years for someone currently aged ${inputs.currentAge}.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                summary.innerHTML = `
+                    <h3 class="section-title">Summary</h3>
+                    <div class="mb-4 p-4 bg-gray-100 rounded">
+                        <div class="font-semibold text-amber-600">
+                            Your current plan needs some adjustments to meet your retirement goals.
+                        </div>
+                        <div class="mt-2">
+                            <p>To achieve your desired retirement income of £${inputs.desiredPostTaxIncome.toLocaleString()} per year, choose one of these options:</p>
+                            <ul class="list-disc ml-6 mt-2">
+                                <li><strong>Option 1:</strong> Increase your pension contributions by £${recommendations.additionalContributions.toLocaleString()} per year (currently £${inputs.annualPensionContributions.toLocaleString()} per year)</li>
+                                <li><strong>Option 2:</strong> Reduce your target retirement income to £${recommendations.sustainableIncome.toLocaleString()} per year (currently targeting £${inputs.desiredPostTaxIncome.toLocaleString()} per year)</li>
+                                <li><strong>Option 3:</strong> Delay your retirement by ${recommendations.yearsToDelay} year${recommendations.yearsToDelay !== 1 ? 's' : ''} (to age ${inputs.retirementAge + recommendations.yearsToDelay})</li>
+                            </ul>
+                            <p class="mt-2 text-sm text-gray-600">
+                                You can also combine these options. For example, increasing contributions by half the suggested amount and delaying retirement by half the suggested years.
+                            </p>
+                            <p class="mt-2 text-sm text-gray-600">
+                                Note: Calculations are based on average female life expectancy of ${recommendations.lifeExpectancy} years for someone currently aged ${inputs.currentAge}.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            updateCharts(results);
+
+            resultsTable.innerHTML = results.savingsTrajectory.map(year => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">${year.age}</td>
+                    <td class="px-4 py-2">£${year.totalSavings.toLocaleString()}</td>
+                    <td class="px-4 py-2">£${year.returns.toLocaleString()}</td>
+                    <td class="px-4 py-2">${year.contributions > 0 ? `£${year.contributions.toLocaleString()}` : '-'}</td>
+                    <td class="px-4 py-2">${year.pensionWithdrawalPostTax > 0 ? `£${year.pensionWithdrawalPostTax.toLocaleString()}` : '-'}</td>
+                    <td class="px-4 py-2">${year.isaWithdrawal > 0 ? `£${year.isaWithdrawal.toLocaleString()}` : '-'}</td>
+                    <td class="px-4 py-2">${year.postRetirementIncome > 0 ? `£${year.postRetirementIncome.toLocaleString()}` : '-'}</td>
+                    <td class="px-4 py-2">${year.statePension > 0 ? `£${year.statePension.toLocaleString()}` : '-'}</td>
+                    <td class="px-4 py-2 font-semibold">${year.totalIncome > 0 ? `£${year.totalIncome.toLocaleString()}` : '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const inputs = {
+                currentAge: Number(formData.get('currentAge')),
+                retirementAge: Number(formData.get('retirementAge')),
+                currentPensionSavings: Number(formData.get('currentPensionSavings')),
+                annualPensionContributions: Number(formData.get('annualPensionContributions')),
+                currentIsaSavings: Number(formData.get('currentIsaSavings')),
+                annualIsaContributions: Number(formData.get('annualIsaContributions')),
+                desiredPostTaxIncome: Number(formData.get('desiredPostTaxIncome')),
+                postRetirementIncome: Number(formData.get('postRetirementIncome')),
+                returnRate: Number(formData.get('returnRate')),
+                inflationRate: Number(formData.get('inflationRate')),
+                takeLumpSum: formData.get('takeLumpSum') === 'on'
+            };
+
+            const results = calculatePension(inputs);
+            updateResults(results, inputs);
+        });
+    </script>
+</body>
+</html>
